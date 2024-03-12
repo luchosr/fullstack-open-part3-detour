@@ -2,7 +2,7 @@
 
 
 
-GET http://localhost:3001/api/persons/
+GET http://localhost:3001/api/notes/
 
 ###
 POST http://localhost:3001/api/notes/ HTTP/1.1
@@ -12,15 +12,23 @@ content-type: application/json
     "content": "sample",
     "important": true
 }
-
 ###
 POST http://localhost:3001/api/persons/ HTTP/1.1
 content-type: application/json
   
 {
-    "name": "Carlos Menem",
+    "name": "Arto Hellas",
     "number": "123121"
 }
 
 ###
 DELETE http://localhost:3001/api/persons/12
+
+###
+POST http://localhost:3001/api/persons/ HTTP/1.1
+content-type: application/json
+
+{
+     name: "Carlos Menem",
+    number: "123121"
+}

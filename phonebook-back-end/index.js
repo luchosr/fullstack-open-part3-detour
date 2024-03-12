@@ -1,9 +1,13 @@
 const express = require('express');
-var morgan = require('morgan');
+const morgan = require('morgan');
 const app = express();
 
-// app.use(express.json());
+app.use(express.json());
 app.use(morgan('tiny'));
+morgan.token('body', (req) => JSON.stringify(req.body));
+app.use(
+  morgan(':method :url :status :res[content-length] - :response-time ms :body')
+);
 
 let persons = [
   {
@@ -54,25 +58,36 @@ app.get('/api/persons/:id', (request, response) => {
 
 const generateId = () => {
   const maxId = persons.length > 0 ? Math.max(...persons.map((n) => n.id)) : 0;
-  return Math.round(Math.random() * maxId * 2);
+  return Math.round(Math.random() * maxId * 2) + 1;
 };
 
 app.post('/api/persons', (request, response) => {
   const body = request.body;
 
+  if (!body.name) {
+    return response.status(400).json({
+      error: 'content missing',
+    });
+  }
+
   const person = {
     name: body.name,
     number: body.number,
-    id: generateId() + 1,
+    id: generateId(),
   };
 
-  if (!body.name || !body.number) {
+  if (
+    persons.some(
+      (person) =>
+        person.name.toLocaleLowerCase() == body.name.toLocaleLowerCase()
+    )
+  ) {
     return response.status(400).json({
-      error: 'missing body number or body name',
+      error: 'name must be unique',
     });
-  } else if (persons.find((person) => person.name === body.name)) {
+  } else if (persons.some((person) => person.number == body.number)) {
     return response.status(400).json({
-      error: 'person  name already exists on phonebook',
+      error: 'number must be unique',
     });
   } else {
     persons = persons.concat(person);
@@ -80,6 +95,14 @@ app.post('/api/persons', (request, response) => {
     response.json(person);
   }
 });
+
+// app.post('/api/persons', (request, response) => {
+//   const person = request.body;
+
+//   person.id = generateId();
+//   console.log(person);
+//   response.json(person);
+// });
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id);
