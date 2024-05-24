@@ -35,9 +35,11 @@ mongoose
 
 const date = new Date();
 
-app.get('/info', (request, response) => {
-  response.send(
-    `<p>Phonebook has info for ${persons.length} people</p><br/><p>${date}</p>`
+app.get('/info', (request, response, next) => {
+  Person.estimatedDocumentCount({}).then((count) =>
+    response.send(
+      `<p>Phonebook has info for ${count} people</p><br/><p>${date}</p>`
+    )
   );
 });
 
