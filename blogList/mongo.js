@@ -5,9 +5,9 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-// const password = process.argv[2];
+const password = process.argv[2];
 
-// const url = `mongodb+srv://luchosr:${password}@fsopencluster0.xyz4huo.mongodb.net/Bloglist?retryWrites=true&w=majority&appName=FSOpenCluster0`;
+const url = `mongodb+srv://luchosr:${password}@fsopencluster0.xyz4huo.mongodb.net/Bloglist?retryWrites=true&w=majority&appName=FSOpenCluster0`;
 
 mongoose.set('strictQuery', false);
 
@@ -30,18 +30,6 @@ const blogSchema = new mongoose.Schema({
 });
 
 const Blog = mongoose.model('Blog', blogSchema);
-
-// const blog = new Blog({
-//   title: 'My mongoose blog',
-//   author: 'Mongo',
-//   url: 'www.globalactions.com',
-//   likes: 6,
-// });
-
-// blog.save().then((result) => {
-//   console.log('blog saved!');
-//   mongoose.connection.close();
-// });
 
 if (process.argv[3]) {
   const blog = new Blog({

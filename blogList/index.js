@@ -17,63 +17,13 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
-// let blogs = [
-//   {
-//     title: 'My first blog',
-//     author: 'Luciano',
-//     url: 'www.global.com',
-//     likes: 2,
-//     id: 1,
-//   },
-//   {
-//     title: 'My second blog',
-//     author: 'Alberto',
-//     url: 'www.globalactions.com',
-//     likes: 6,
-//     id: 2,
-//   },
-// ];
-
-const mongoose = require('mongoose');
-
-const password = process.argv[2];
+// const password = process.argv[2];
 
 mongoose.set('strictQuery', false);
 
 const url = process.env.MONGODB_URI;
 
 console.log('connecting to', url);
-
-// const Blog = mongoose.model('Blog', blogSchema);
-
-// const mongoUrl = 'mongodb://localhost/bloglist';
-// mongoose.connect(mongoUrl);
-
-// app.use(cors());
-
-// const password = process.argv[2];
-
-// const url = `mongodb+srv://luchosr:${password}@fsopencluster0.xyz4huo.mongodb.net/Bloglist?retryWrites=true&w=majority&appName=FSOpenCluster0`;
-
-// mongoose.set('strictQuery', false);
-// mongoose.connect(url);
-
-// const blogSchema = new mongoose.Schema({
-//   title: String,
-//   author: String,
-//   url: String,
-//   likes: Number,
-// });
-
-// blogSchema.set('toJSON', {
-//   transform: (document, returnedObject) => {
-//     returnedObject.id = returnedObject._id.toString();
-//     delete returnedObject._id;
-//     delete returnedObject.__v;
-//   },
-// });
-
-// const Blog = mongoose.model('Blog', blogSchema);
 
 mongoose
   .connect(url)
@@ -96,21 +46,13 @@ app.get('/info', (request, response) => {
 
 app.get('/api/blogs', (request, response, next) => {
   Blog.find({})
-    .then((blog) => {
+    .then((blogs) => {
       response.json(blogs);
     })
     .catch((error) => next(error));
 });
 
 app.get('/api/blogs/:id', (request, response, next) => {
-  // const id = Number(request.params.id);
-  // const blog = blogs.find((blog) => blog.id === id);
-  // if (blog) {
-  //   response.json(blog);
-  // } else {
-  //   response.status(404).end();
-  // }
-
   Blog.findById(request.params.id)
     .then((blog) => {
       if (blog) {
@@ -123,24 +65,6 @@ app.get('/api/blogs/:id', (request, response, next) => {
 });
 
 app.post('/api/blogs', (request, response) => {
-  // const body = request.body;
-  // if (!body.title) {
-  //   return response.status(400).json({
-  //     error: 'title missing',
-  //   });
-  // }
-
-  // const blog = {
-  //   title: body.title,
-  //   author: body.author,
-  //   url: body.url,
-  //   likes: body.likes,
-  //   id: generateId(),
-  // };
-
-  // blogs = blogs.concat(blog);
-
-  // response.json(blog);
   const { title, author, url, likes } = request.body;
 
   if (!title) {
@@ -159,36 +83,12 @@ app.post('/api/blogs', (request, response) => {
 });
 
 app.delete('/api/blogs/:id', (request, response, next) => {
-  // const id = Number(request.params.id);
-  // blogs = blogs.filter((blog) => blog.id !== id);
-
-  // response.status(204).end();
-
   Blog.findByIdAndDelete(request.params.id)
     .then((result) => {
       response.status(204).end();
     })
     .catch((error) => next(error));
 });
-
-const generateId = () => {
-  const maxId = blogs.length > 0 ? Math.max(...blogs.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
-
-// app.get('/api/blogs', (request, response) => {
-//   Blog.find({}).then((blogs) => {
-//     response.json(blogs);
-//   });
-// });
-
-// app.post('/api/blogs', (request, response) => {
-//   const blog = new Blog(request.body);
-
-//   blog.save().then((result) => {
-//     response.status(201).json(result);
-//   });
-// });
 
 app.put('/api/blogs/:id', (request, response, next) => {
   const { title, author, url, likes } = request.body;
