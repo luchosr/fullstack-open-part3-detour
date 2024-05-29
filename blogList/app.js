@@ -1,9 +1,12 @@
 require('dotenv').config();
+const config = require('./utils/config');
+const logger = require('./utils/logger');
 const express = require('express');
+const app = express();
+
 const morgan = require('morgan');
 const Blog = require('./models/blog');
-
-const app = express();
+const blogsRouter = require('./controllers/blogs');
 
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -17,19 +20,21 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
+app.use('/api/blogs', blogsRouter);
+
 mongoose.set('strictQuery', false);
 
 const url = process.env.MONGODB_URI;
 
-console.log('connecting to', url);
+logger.info('connecting to', config.MONGODB_URI);
 
 mongoose
   .connect(url)
   .then((result) => {
-    console.log('connected to MongoDB');
+    logger.info('connected to MongoDB');
   })
   .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message);
+    logger.info('error connecting to MongoDB:', error.message);
   });
 
 const date = new Date();
@@ -42,71 +47,71 @@ app.get('/info', (request, response) => {
   );
 });
 
-app.get('/api/blogs', (request, response, next) => {
-  Blog.find({})
-    .then((blogs) => {
-      response.json(blogs);
-    })
-    .catch((error) => next(error));
-});
+// app.get('/api/blogs', (request, response, next) => {
+//   Blog.find({})
+//     .then((blogs) => {
+//       response.json(blogs);
+//     })
+//     .catch((error) => next(error));
+// });
 
-app.get('/api/blogs/:id', (request, response, next) => {
-  Blog.findById(request.params.id)
-    .then((blog) => {
-      if (blog) {
-        response.json(blog);
-      } else {
-        response.status(404).end();
-      }
-    })
-    .catch((error) => next(error));
-});
+// app.get('/api/blogs/:id', (request, response, next) => {
+//   Blog.findById(request.params.id)
+//     .then((blog) => {
+//       if (blog) {
+//         response.json(blog);
+//       } else {
+//         response.status(404).end();
+//       }
+//     })
+//     .catch((error) => next(error));
+// });
 
-app.post('/api/blogs', (request, response) => {
-  const { title, author, url, likes } = request.body;
+// app.post('/api/blogs', (request, response) => {
+//   const { title, author, url, likes } = request.body;
 
-  if (!title) {
-    return response.status(400).json({ error: 'title missing' });
-  } else if (!author) {
-    return response.status(400).json({ error: 'author missing' });
-  }
+//   if (!title) {
+//     return response.status(400).json({ error: 'title missing' });
+//   } else if (!author) {
+//     return response.status(400).json({ error: 'author missing' });
+//   }
 
-  const blog = new Blog({ title, author, url, likes });
-  blog
-    .save()
-    .then((savedBlog) => {
-      response.json(savedBlog);
-    })
-    .catch((error) => next(error));
-});
+//   const blog = new Blog({ title, author, url, likes });
+//   blog
+//     .save()
+//     .then((savedBlog) => {
+//       response.json(savedBlog);
+//     })
+//     .catch((error) => next(error));
+// });
 
-app.delete('/api/blogs/:id', (request, response, next) => {
-  Blog.findByIdAndDelete(request.params.id)
-    .then((result) => {
-      response.status(204).end();
-    })
-    .catch((error) => next(error));
-});
+// app.delete('/api/blogs/:id', (request, response, next) => {
+//   Blog.findByIdAndDelete(request.params.id)
+//     .then((result) => {
+//       response.status(204).end();
+//     })
+//     .catch((error) => next(error));
+// });
 
-app.put('/api/blogs/:id', (request, response, next) => {
-  const { title, author, url, likes } = request.body;
+// app.put('/api/blogs/:id', (request, response, next) => {
+//   const { title, author, url, likes } = request.body;
 
-  const blog = {
-    title,
-    author,
-    url,
-    likes,
-  };
-  if (!title || !author) {
-    return response.status(400).json({ error: 'title or author missing' });
-  }
+//   const blog = {
+//     title,
+//     author,
+//     url,
+//     likes,
+//   };
+//   if (!title || !author) {
+//     return response.status(400).json({ error: 'title or author missing' });
+//   }
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then((updatedBlog) => {
-      response.json(updatedBlog);
-    })
-    .catch((error) => next(error));
-});
+//   Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+//     .then((updatedBlog) => {
+//       response.json(updatedBlog);
+//     })
+//     .catch((error) => next(error));
+// });
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' });
