@@ -9,13 +9,21 @@ if (process.argv.length < 3) {
 
 // const url = `mongodb+srv://luchosr:${password}@fsopencluster0.xyz4huo.mongodb.net/Bloglist?retryWrites=true&w=majority&appName=FSOpenCluster0`;
 
-// mongoose.set('strictQuery', false);
+mongoose.set('strictQuery', false);
 
-// mongoose.connect(url);
+mongoose.connect(url);
 
 const blogSchema = new mongoose.Schema({
-  title: String,
-  author: String,
+  title: {
+    type: String,
+    minLength: 3,
+    required: [true, 'Blog title is required'],
+  },
+  author: {
+    type: String,
+    minLength: 3,
+    required: [true, 'Author name is required'],
+  },
   url: String,
   likes: Number,
   important: Boolean,
@@ -23,12 +31,12 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema);
 
-const blog = new Blog({
-  title: 'My mongoose blog',
-  author: 'Mongo',
-  url: 'www.globalactions.com',
-  likes: 6,
-});
+// const blog = new Blog({
+//   title: 'My mongoose blog',
+//   author: 'Mongo',
+//   url: 'www.globalactions.com',
+//   likes: 6,
+// });
 
 // blog.save().then((result) => {
 //   console.log('blog saved!');
